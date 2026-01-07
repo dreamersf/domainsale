@@ -17,9 +17,11 @@ import {
   DollarSign,
   Languages,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  Award,
+  Target
 } from 'lucide-react';
-import { generatePersuasiveCopy } from './services/geminiService';
+// import { generatePersuasiveCopy } from './services/geminiService'; // 已改为使用静态文案
 import { UseCase } from './types';
 
 type Language = 'en' | 'cn';
@@ -33,12 +35,19 @@ const translations = {
     hero_cta: "Make an Offer",
     hero_badge: "International Ready",
     pitch_title: "Visionary Branding",
+    pitch: "e-conn.com is a premium digital asset of exceptional strategic value. Its concise, powerful, and internationally resonant name directly captures the core proposition of 'electronic connectivity' in the digital era. Whether building cutting-edge technology ecosystems or shaping global business landscapes, e-conn naturally endows brands with inherent authority and technological foresight. It serves as the golden intersection connecting innovative technology with commercial applications, bridging the present and the future, empowering your brand to rapidly establish leadership and win market trust in the fiercely competitive global digital economy.",
     benefits_1_title: "Ultra Concise",
     benefits_1_desc: "Only 5 letters before the dot. Easy to type, hard to forget, and perfect for global branding.",
     benefits_2_title: "Universal Appeal",
     benefits_2_desc: "Ideal for IoT, networking, e-commerce, or enterprise connectivity solutions worldwide.",
     benefits_3_title: "Safe Transfer",
     benefits_3_desc: "Transactions are processed via Alibaba Cloud (Aliyun) Escrow to ensure 100% security and instant delivery.",
+    benefits_4_title: "Premium Investment",
+    benefits_4_desc: "A valuable digital asset with strong appreciation potential in the rapidly growing digital economy.",
+    benefits_5_title: "Brand Authority",
+    benefits_5_desc: "Instantly establishes credibility and professional image, enhancing brand recognition and market positioning.",
+    benefits_6_title: "SEO Advantage",
+    benefits_6_desc: "Short, memorable domain names perform better in search rankings and are easier for users to recall and share.",
     contact_secure: "Alibaba Cloud Escrow Supported",
     contact_title: "Acquisition Inquiry",
     contact_sub: "Directly reach the owner. All transfers are protected by official escrow platforms.",
@@ -71,12 +80,19 @@ const translations = {
     hero_cta: "提交报价",
     hero_badge: "国际通用",
     pitch_title: "前瞻性品牌定位",
+    pitch: "e-conn.com 是极具战略价值的顶级数字资产。其简练、有力且富有国际化色彩的命名，直接锁定了\"电子连接\"这一数字化时代的核心命题。无论是构建前沿的科技生态，还是塑造全球化的商业版图，e-conn 都能为品牌赋予天然的权威性与技术前瞻感。它是连接创新技术与商业应用、现在与未来的黄金交汇点，助力您的品牌在竞争激烈的全球数字经济中迅速确立领跑地位并赢得市场信任。",
     benefits_1_title: "极致简约",
     benefits_1_desc: "仅5个字母。易记、易输入，是全球化品牌的不二之选。",
     benefits_2_title: "广泛适用",
     benefits_2_desc: "完美契合物联网、网络通信、电子商务或企业级连接方案。",
     benefits_3_title: "阿里云中介保障",
     benefits_3_desc: "所有交易支持通过阿里云（Alibaba Cloud）担保或带价 Push 方式进行，安全极速。",
+    benefits_4_title: "优质投资资产",
+    benefits_4_desc: "极具升值潜力的数字资产，在快速发展的数字经济中具有长期投资价值。",
+    benefits_5_title: "品牌权威性",
+    benefits_5_desc: "立即建立专业形象和可信度，提升品牌认知度和市场定位。",
+    benefits_6_title: "SEO 优势",
+    benefits_6_desc: "简短易记的域名在搜索引擎排名中表现更优，用户更易记忆和分享。",
     contact_secure: "支持阿里云中介交易",
     contact_title: "收购咨询",
     contact_sub: "直接与持有人联系。成交后将通过官方平台完成过户，确保万无一失。",
@@ -105,8 +121,6 @@ const translations = {
 
 const App: React.FC = () => {
   const [lang, setLang] = useState<Language>('cn');
-  const [loading, setLoading] = useState(true);
-  const [pitchData, setPitchData] = useState<{ pitch: string; useCases: UseCase[] } | null>(null);
   const [formStatus, setFormStatus] = useState<'idle' | 'sending' | 'success'>('idle');
   const [offerValue, setOfferValue] = useState('');
   
@@ -114,14 +128,23 @@ const App: React.FC = () => {
   const domainName = "e-conn.com";
   const t = translations[lang];
 
+  // 静态文案数据
+  const pitchData = {
+    pitch: t.pitch,
+    useCases: lang === 'cn' ? [
+      { title: "物联网方案", description: "物联网架构的理想中心枢纽。", icon: "cpu" },
+      { title: "电子商务", description: "全球电子商务连接的极佳品牌。", icon: "shopping-bag" },
+      { title: "网络硬件", description: "直指交换机、路由器和连接技术市场。", icon: "server" },
+      { title: "企业软件", description: "通过无缝电子系统连接企业。", icon: "briefcase" }
+    ] : [
+      { title: "IoT Solutions", description: "The perfect hub for internet-of-things architecture.", icon: "cpu" },
+      { title: "E-Commerce", description: "A memorable brand for global electronic commerce connectivity.", icon: "shopping-bag" },
+      { title: "Network Hardware", description: "Direct positioning for switches, routers, and connectivity tech.", icon: "server" },
+      { title: "Enterprise Software", description: "Connecting businesses through seamless electronic systems.", icon: "briefcase" }
+    ]
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      const data = await generatePersuasiveCopy(domainName, lang);
-      setPitchData(data);
-      setLoading(false);
-    };
-    fetchData();
     document.documentElement.lang = lang === 'en' ? 'en' : 'zh-CN';
   }, [lang]);
 
@@ -207,14 +230,17 @@ const App: React.FC = () => {
           </div>
         </section>
 
-        <section className="max-w-7xl mx-auto px-6 mt-32 grid grid-cols-1 md:grid-cols-3 gap-8">
+        <section className="max-w-7xl mx-auto px-6 mt-32 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {[
-            { icon: <Zap />, title: t.benefits_1_title, desc: t.benefits_1_desc, color: "blue" },
-            { icon: <Globe />, title: t.benefits_2_title, desc: t.benefits_2_desc, color: "indigo" },
-            { icon: <ShieldCheck />, title: t.benefits_3_title, desc: t.benefits_3_desc, color: "emerald", highlight: true }
+            { icon: <Zap />, title: t.benefits_1_title, desc: t.benefits_1_desc, bgColor: "bg-blue-50", textColor: "text-blue-600" },
+            { icon: <Globe />, title: t.benefits_2_title, desc: t.benefits_2_desc, bgColor: "bg-indigo-50", textColor: "text-indigo-600" },
+            { icon: <ShieldCheck />, title: t.benefits_3_title, desc: t.benefits_3_desc, bgColor: "bg-emerald-50", textColor: "text-emerald-600", highlight: true },
+            { icon: <TrendingUp />, title: t.benefits_4_title, desc: t.benefits_4_desc, bgColor: "bg-amber-50", textColor: "text-amber-600" },
+            { icon: <Award />, title: t.benefits_5_title, desc: t.benefits_5_desc, bgColor: "bg-purple-50", textColor: "text-purple-600" },
+            { icon: <Target />, title: t.benefits_6_title, desc: t.benefits_6_desc, bgColor: "bg-rose-50", textColor: "text-rose-600" }
           ].map((benefit, i) => (
             <div key={i} className={`p-8 bg-white rounded-3xl border ${benefit.highlight ? 'border-blue-100 shadow-md ring-1 ring-blue-50' : 'border-slate-100 shadow-sm'} transition-shadow`}>
-              <div className={`w-12 h-12 bg-${benefit.color}-50 rounded-2xl flex items-center justify-center text-${benefit.color}-600 mb-6`}>
+              <div className={`w-12 h-12 ${benefit.bgColor} rounded-2xl flex items-center justify-center ${benefit.textColor} mb-6`}>
                 {benefit.icon}
               </div>
               <h3 className={`text-xl font-bold mb-3 ${benefit.highlight ? 'text-emerald-700' : ''}`}>{benefit.title}</h3>
@@ -224,14 +250,10 @@ const App: React.FC = () => {
         </section>
 
         <section className="max-w-4xl mx-auto px-6 mt-32 text-center">
-          {loading ? (
-            <div className="space-y-4 opacity-50"><div className="h-6 w-48 bg-slate-200 mx-auto rounded animate-pulse"></div><div className="h-32 w-full bg-slate-100 rounded animate-pulse"></div></div>
-          ) : (
-            <div className="space-y-6">
-              <h2 className="text-2xl font-semibold text-slate-800">{t.pitch_title}</h2>
-              <p className="text-lg text-slate-600 leading-relaxed italic">"{pitchData?.pitch}"</p>
-            </div>
-          )}
+          <div className="space-y-6">
+            <h2 className="text-2xl font-semibold text-slate-800">{t.pitch_title}</h2>
+            <p className="text-lg text-slate-600 leading-relaxed italic">"{pitchData.pitch}"</p>
+          </div>
         </section>
 
         {/* scroll-mt-24 ensures the section title is visible below the fixed nav header */}
