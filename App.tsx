@@ -190,7 +190,12 @@ const App: React.FC = () => {
         padding: '10px',
         textAlign: 'center',
         fontWeight: 'bold',
-        fontSize: '18px'
+        fontSize: '18px',
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100%',
+        zIndex: 1000
       }}>
         {lang === 'cn' ? '此域名正在出售！立即联系我们以获取更多信息。' : 'This domain is for sale! Contact us now for more details.'}
       </div>
