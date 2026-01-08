@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   Globe, 
@@ -184,6 +183,17 @@ const App: React.FC = () => {
     <div className="min-h-screen selection:bg-blue-100">
       {/* Hidden Iframe for silent form submission */}
       <iframe name="hidden_iframe" id="hidden_iframe" style={{ display: 'none' }}></iframe>
+
+      <div style={{
+        backgroundColor: '#ffeb3b',
+        color: '#000',
+        padding: '10px',
+        textAlign: 'center',
+        fontWeight: 'bold',
+        fontSize: '18px'
+      }}>
+        {lang === 'cn' ? '此域名正在出售！立即联系我们以获取更多信息。' : 'This domain is for sale! Contact us now for more details.'}
+      </div>
 
       <nav className="fixed top-0 w-full z-50 bg-white/70 backdrop-blur-md border-b border-slate-100">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
