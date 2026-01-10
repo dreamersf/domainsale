@@ -192,7 +192,7 @@ const App: React.FC = () => {
         fontWeight: 'bold',
         fontSize: '18px',
         position: 'fixed',
-        top: 0,
+        top: 50,
         left: 0,
         width: '100%',
         zIndex: 1000
